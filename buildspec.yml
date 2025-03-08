@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo "Installing dependencies..."
+      - apt-get update && apt-get install -y wget unzip
+      - wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+      - export ANDROID_HOME=$HOME/Android/Sdk
+      - mkdir -p $ANDROID_HOME/cmdline-tools && unzip cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+      - mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+      - yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+
+  pre_build:
+    commands:
+      - echo "Setting up environment..."
+      - chmod +x gradlew
+      - ./gradlew dependencies
+
+  build:
+    commands:
+      - echo "Building APK..."
+      - ./gradlew assembleRelease
+
+  post_build:
+    commands:
+      - echo "Build completed successfully!"
